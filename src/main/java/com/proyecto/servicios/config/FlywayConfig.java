@@ -33,6 +33,7 @@ public class FlywayConfig {
                 .baselineOnMigrate(true)
                 .baselineVersion("0")
                 .load();
+        flyway.repair();   // corrige checksums desalineados en desarrollo
         flyway.migrate();
         return flyway;
     }
