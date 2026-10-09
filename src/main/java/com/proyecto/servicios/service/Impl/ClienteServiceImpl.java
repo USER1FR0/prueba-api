@@ -15,6 +15,7 @@ import com.proyecto.servicios.model.onboarding.response.ClienteResponse;
 import com.proyecto.servicios.repositorys.onboarding.ClienteRepository;
 import com.proyecto.servicios.service.ClienteService;
 import com.proyecto.servicios.service.CuentaService;
+import com.proyecto.servicios.service.auth.UsuarioService;
 import com.proyecto.servicios.service.postal.PostalCodeService;
 import com.proyecto.servicios.service.postal.ResultadoValidacionCP;
 import lombok.extern.slf4j.Slf4j;
@@ -34,15 +35,18 @@ public class ClienteServiceImpl implements ClienteService {
     private final ClienteMapper clienteMapper;
     private final CuentaService cuentaService;
     private final PostalCodeService postalCodeService;
+    private final UsuarioService usuarioService;
 
     public ClienteServiceImpl(ClienteRepository clienteRepository,
                               ClienteMapper clienteMapper,
                               CuentaService cuentaService,
-                              PostalCodeService postalCodeService) {
+                              PostalCodeService postalCodeService,
+                              UsuarioService usuarioService) {
         this.clienteRepository = clienteRepository;
         this.clienteMapper = clienteMapper;
         this.cuentaService = cuentaService;
         this.postalCodeService = postalCodeService;
+        this.usuarioService = usuarioService;
     }
 
     @Override
@@ -61,6 +65,9 @@ public class ClienteServiceImpl implements ClienteService {
         log.info("Cliente registrado con id {}", guardado.getId());
 
         cuentaService.crearCuentaParaCliente(guardado, null);
+
+        // Usuario de acceso 1:1 (correo del cliente como login, password cifrado)
+        usuarioService.crearParaCliente(guardado.getId(), guardado.getCorreo(), request.getPassword());
 
         return construirResponse(guardado);
     }
@@ -159,6 +166,12 @@ public class ClienteServiceImpl implements ClienteService {
         }
 
         Cliente actualizado = clienteRepository.save(cliente);
+
+        // Mantener el correo del usuario de acceso en sync si cambio
+        if (request.getCorreo() != null) {
+            usuarioService.sincronizarCorreo(actualizado.getId(), actualizado.getCorreo());
+        }
+
         return construirResponse(actualizado);
     }
 
@@ -169,6 +182,7 @@ public class ClienteServiceImpl implements ClienteService {
         cliente.setActivo(false);
         clienteRepository.save(cliente);
         cuentaService.inactivarCuentasDeCliente(id);
+        usuarioService.inactivarPorCliente(id);
         log.info("Cliente {} dado de baja logica", id);
     }
 

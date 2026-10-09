@@ -61,6 +61,13 @@ public class GlobalExceptionHandler {
                 List.of("El parametro '" + ex.getName() + "' tiene un valor invalido"), req);
     }
 
+    // ---- Password que no cumple la politica -> 400 ----
+    @ExceptionHandler(ContrasenaInvalidaException.class)
+    public ResponseEntity<ErrorResponse> handleContrasena(
+            ContrasenaInvalidaException ex, HttpServletRequest req) {
+        return build(HttpStatus.BAD_REQUEST, "Error de validacion", List.of(ex.getMessage()), req);
+    }
+
     // ---- Codigo postal que no existe segun la API postal -> 400 ----
     @ExceptionHandler(CodigoPostalInvalidoException.class)
     public ResponseEntity<ErrorResponse> handleCodigoPostal(
@@ -69,7 +76,7 @@ public class GlobalExceptionHandler {
     }
 
     // ---- Recursos no encontrados -> 404 ----
-    @ExceptionHandler({ClienteNoEncontradoException.class, CuentaNoEncontradaException.class})
+    @ExceptionHandler({ClienteNoEncontradoException.class, CuentaNoEncontradaException.class, UsuarioNoEncontradoException.class})
     public ResponseEntity<ErrorResponse> handleNoEncontrado(
             RuntimeException ex, HttpServletRequest req) {
         return build(HttpStatus.NOT_FOUND, "Recurso no encontrado", List.of(ex.getMessage()), req);

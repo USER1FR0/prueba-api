@@ -1,9 +1,15 @@
 # Diagrama Entidad-Relacion
 
+Relaciones:
+- Cliente **(1:1)** Domicilio
+- Cliente **(1:1)** Usuario
+- Cliente **(1:N)** Cuenta
+
 ```mermaid
 erDiagram
     CLIENTES ||--|| DOMICILIOS : tiene
-    CLIENTES ||--o{ CUENTAS : posee
+    CLIENTES ||--|| USUARIOS   : accede_con
+    CLIENTES ||--o{ CUENTAS    : posee
 
     CLIENTES {
         bigint id PK
@@ -27,18 +33,20 @@ erDiagram
         timestamp fecha_creacion
         timestamp fecha_actualizacion
     }
+
     DOMICILIOS {
         bigint id PK
-        bigint cliente_id FK "UNIQUE (1-1)"
+        bigint cliente_id FK "UK"
         varchar calle
         varchar numero_exterior
         varchar numero_interior
         varchar colonia
         varchar municipio
         varchar estado
-        char codigo_postal
-        varchar pais
+        varchar codigo_postal
+        varchar pais "ISO 3166"
     }
+
     CUENTAS {
         bigint id PK
         char numero_cuenta UK
@@ -48,8 +56,14 @@ erDiagram
         timestamp fecha_creacion
         timestamp fecha_actualizacion
     }
-```
 
-Relaciones:
-- Cliente (1) -- (1) Domicilio  -> FK unica cliente_id en domicilios
-- Cliente (1) -- (N) Cuenta      -> FK cliente_id en cuentas
+    USUARIOS {
+        bigint id PK
+        bigint cliente_id FK "UK"
+        varchar correo UK
+        varchar password_hash
+        boolean activo
+        timestamp fecha_creacion
+        timestamp fecha_actualizacion
+    }
+```
