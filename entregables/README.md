@@ -1,14 +1,12 @@
-# Entregables - Onboarding de Clientes
+# Entregables — Onboarding de Clientes Personas Físicas
 
-| Archivo | Contenido |
-|---------|-----------|
-| 01-diagrama-ER.md        | Diagrama entidad-relacion (Mermaid) |
-| 02-script-bd.sql         | Script de creacion de tablas (= migracion Flyway V2) |
-| 03 payloads/             | JSON de ejemplo validos |
-| 03 payloads/invalidos/   | JSON para pruebas de validacion (deben dar 400) |
-| 04-pruebas.http          | Coleccion de requests (VS Code / IntelliJ HTTP Client) |
-| 05-pruebas-estres-k6.js  | Script de carga/estres con k6 |
-| 06-documento-tecnico.md  | Documento tecnico de la solucion |
+| # | Entregable (requerimiento) | Archivo |
+|---|---|---|
+| 1 | Diagrama entidad-relación | `01-diagrama-ER.md` |
+| 2 | Script de creación de base de datos | `02-script-bd.sql` |
+| 3 | API REST funcional (guía de endpoints y payloads) | `03-guia-endpoints.md` · `payloads/` |
+| 4 | Documento técnico | `04-documento-tecnico.md` |
+| 5 | Código fuente completo | Raíz del repositorio |
+| 6 | Evidencias de pruebas | Capturas a generar al ejecutar la guía |
 
-Evidencias: ejecutar la coleccion `04-pruebas.http` y/o k6, y guardar las
-respuestas/capturas en una carpeta `evidencias/`.
+**Swagger UI:** `http://localhost:8081/swagger-ui.html`

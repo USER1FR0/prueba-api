@@ -7,8 +7,9 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 /**
- * Usuario de autenticacion (endpoint aislado). El password se guarda como
- * hash BCrypt en password_hash, nunca en claro.
+ * Usuario de acceso del cliente (relacion 1:1 con Cliente).
+ * Se crea automaticamente al registrar el cliente; el correo del cliente es
+ * el nombre de usuario y el password se guarda cifrado con BCrypt.
  */
 @Entity
 @Table(name = "usuarios")
@@ -19,6 +20,9 @@ public class Usuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "cliente_id", nullable = false, unique = true, updatable = false)
+    private Long clienteId;
 
     @Column(name = "correo", nullable = false, length = 100, unique = true)
     private String correo;
@@ -32,13 +36,23 @@ public class Usuario {
     @Column(name = "fecha_creacion", nullable = false, updatable = false)
     private LocalDateTime fechaCreacion;
 
+    @Column(name = "fecha_actualizacion")
+    private LocalDateTime fechaActualizacion;
+
     @PrePersist
     void prePersist() {
+        LocalDateTime ahora = LocalDateTime.now();
         if (fechaCreacion == null) {
-            fechaCreacion = LocalDateTime.now();
+            fechaCreacion = ahora;
         }
+        fechaActualizacion = ahora;
         if (activo == null) {
             activo = true;
         }
+    }
+
+    @PreUpdate
+    void preUpdate() {
+        fechaActualizacion = LocalDateTime.now();
     }
 }

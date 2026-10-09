@@ -22,4 +22,7 @@ public final class PatronesValidacion {
 
     /** Codigo postal de exactamente 5 digitos. */
     public static final String CODIGO_POSTAL = "^[0-9]{5}$";
+
+    /** Password: min 8, al menos una mayuscula, una minuscula, un numero y un caracter especial. */
+    public static final String PASSWORD = "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9]).{8,}$";
 }

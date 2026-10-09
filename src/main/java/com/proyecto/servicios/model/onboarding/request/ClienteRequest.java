@@ -85,4 +85,9 @@ public class ClienteRequest {
     @NotNull(message = "El domicilio es obligatorio")
     @Valid
     private DomicilioRequest domicilio;
+
+    @NotBlank(message = "El password es obligatorio")
+    @Pattern(regexp = PatronesValidacion.PASSWORD,
+            message = "El password debe tener minimo 8 caracteres, una mayuscula, una minuscula, un numero y un caracter especial")
+    private String password;
 }
