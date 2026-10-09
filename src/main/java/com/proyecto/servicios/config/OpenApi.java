@@ -7,19 +7,24 @@ import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
+
 @Configuration
 public class OpenApi {
 
     @Bean
     public OpenAPI openAPI() {
+        // Servidor RELATIVO: Swagger usa el host donde se sirve (local o produccion),
+        // evitando que "Try it out" apunte siempre a localhost.
+        Server servidor = new Server().url("/").description("Host actual");
         return new OpenAPI()
+                .servers(List.of(servidor))
                 .info(new Info()
                         .title("Onboarding de Clientes - API")
                         .version("v1")
                         .description("API REST para el onboarding de clientes persona fisica: "
-                                + "alta con validaciones, cuentas, y autenticacion JWT (endpoint aislado). "
+                                + "alta con validaciones, cuentas, usuarios y autenticacion JWT. "
                                 + "Todos los endpoints de negocio viven bajo el prefijo /api/v1.")
-                        .contact(new Contact().name("Equipo Onboarding")))
-                .addServersItem(new Server().url("http://localhost:8081").description("Local"));
+                        .contact(new Contact().name("Equipo Onboarding")));
     }
 }
