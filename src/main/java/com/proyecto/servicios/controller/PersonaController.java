@@ -14,10 +14,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
-import java.awt.*;
 
 @RestController
+@Tag(name = "Personas", description = "Alta, actualizacion y baja de personas (modulo heredado, independiente del onboarding).")
 public class PersonaController {
 
 
@@ -25,17 +27,20 @@ public class PersonaController {
     private PersonaService personaService;
 
 
+    @Operation(summary = "Crear persona")
     @PostMapping(value = "/personas",produces =MediaType.APPLICATION_JSON_VALUE,consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GenericResponse> crearUser(@Valid @RequestBody PersonasRequest personasRequest){
 
         return new ResponseEntity<>(personaService.creaPersona(personasRequest), HttpStatus.OK);
     }
 
+    @Operation(summary = "Actualizar persona")
     @PutMapping(value = "/personasActualiza", produces =MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GenericResponse> actualizUser(@Valid @RequestBody PersonasRequest personasRequest){
 
         return new ResponseEntity<>(personaService.actualizaPersona(personasRequest), HttpStatus.OK);
     }
+    @Operation(summary = "Eliminar persona")
     @PutMapping(value = "/personasElimina", produces =MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GenericResponse> actualizUser(@Valid @RequestBody EliminaPersonaRequest personasRequest){
 
