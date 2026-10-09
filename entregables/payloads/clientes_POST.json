@@ -1,0 +1,29 @@
+{
+  "nombre": "Juan",
+  "segundoNombre": "Carlos",
+  "apellidoPaterno": "Rodriguez",
+  "apellidoMaterno": "Guerrero",
+  "fechaNacimiento": "2000-01-15",
+  "curp": "ROGR000115HGTXYZ09",
+  "rfc": "ROGR0001159A1",
+  "sexo": "MASCULINO",
+  "nacionalidad": "Mexicana",
+  "estadoCivil": "SOLTERO",
+  "correo": "juan.rodriguez@example.com",
+  "telefonoMovil": "4771234567",
+  "telefonoAlterno": "4779876543",
+  "ocupacion": "Ingeniero de Software",
+  "empresa": "Acme SA de CV",
+  "ingresoMensual": 25000.0,
+  "domicilio": {
+    "calle": "Av. Juarez",
+    "numeroExterior": "123",
+    "numeroInterior": "4B",
+    "colonia": "Centro",
+    "municipio": "Dolores Hidalgo",
+    "estado": "GUANAJUATO",
+    "codigoPostal": "37800",
+    "pais": "MX"
+  },
+  "password": "Passw0rd!"
+}
