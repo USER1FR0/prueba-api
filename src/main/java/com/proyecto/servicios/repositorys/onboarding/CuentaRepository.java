@@ -18,4 +18,6 @@ public interface CuentaRepository extends JpaRepository<Cuenta, Long> {
     List<Cuenta> findByClienteId(Long clienteId);
 
     List<Cuenta> findByEstatus(EstatusCuenta estatus);
+
+    List<Cuenta> findByClienteIdAndEstatus(Long clienteId, EstatusCuenta estatus);
 }

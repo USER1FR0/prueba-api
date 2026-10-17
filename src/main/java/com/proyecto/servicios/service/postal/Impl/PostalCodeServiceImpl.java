@@ -29,6 +29,8 @@ import java.util.Map;
 @Slf4j
 public class PostalCodeServiceImpl implements PostalCodeService {
 
+    private static final String CACHE_CP = "codigosPostales";
+
     private final ZipcodestackClient zipcodestackClient;
     private final ZippopotamClient zippopotamClient;
     private final String zipcodestackApiKey;
@@ -42,7 +44,7 @@ public class PostalCodeServiceImpl implements PostalCodeService {
     }
 
     @Override
-    @Cacheable(value = "codigosPostales", key = "#paisIso + '|' + #codigoPostal", unless = "#result == T(com.proyecto.servicios.service.postal.ResultadoValidacionCP).NO_VERIFICABLE")
+    @Cacheable(value = CACHE_CP, key = "#paisIso + '|' + #codigoPostal", unless = "#result == T(com.proyecto.servicios.service.postal.ResultadoValidacionCP).NO_VERIFICABLE")
     public ResultadoValidacionCP validar(String codigoPostal, String paisIso) {
         if (codigoPostal == null || codigoPostal.isBlank() || paisIso == null || paisIso.isBlank()) {
             return ResultadoValidacionCP.NO_VERIFICABLE;

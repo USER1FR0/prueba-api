@@ -1,8 +1,9 @@
 {
+  "id": 1,
   "correo": "nuevo.correo@example.com",
   "telefonoMovil": "4770001111",
   "ocupacion": "Arquitecto de Software",
-  "ingresoMensual": 32000.00,
+  "ingresoMensual": 32000.0,
   "domicilio": {
     "calle": "Av. Reforma",
     "numeroExterior": "500",

@@ -5,7 +5,6 @@ import com.proyecto.servicios.model.GenericResponse;
 import com.proyecto.servicios.model.PersonasRequest;
 import com.proyecto.servicios.service.PersonaService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -23,8 +22,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 public class PersonaController {
 
 
-    @Autowired
-    private PersonaService personaService;
+    private final PersonaService personaService;
+
+    public PersonaController(PersonaService personaService) {
+        this.personaService = personaService;
+    }
 
 
     @Operation(summary = "Crear persona")

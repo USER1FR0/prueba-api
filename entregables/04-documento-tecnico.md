@@ -12,6 +12,13 @@ automática, les crea una cuenta bancaria y un usuario de acceso, con autenticac
 - Spring Security (BCrypt) · JWT (HS256)
 - OpenAPI / Swagger
 
+## 2.1 Contrato de API (clean code / KISS)
+- **Sin `@PathVariable` ni `@RequestParam`:** identificadores y filtros viajan en Request DTOs (`@RequestBody` + `@Valid`).
+- **Búsqueda única combinable:** `POST /clientes/buscar` con filtros opcionales resueltos por `Specification` (JPA Criteria), en lugar de un endpoint por campo.
+- **Envelope uniforme `ApiResponse<T>`** para éxito y error (`codigo`, `mensaje`, `datos`).
+- **Returns tipados** (`ResponseEntity<ApiResponse<...>>`).
+- **Jerarquía de excepciones** por familia (404/409/400) para centralizar el manejo.
+
 ## 3. Arquitectura
 Capas: `controller` → `service` → `repository` → `entity`.
 - **controller:** expone la API REST (prefijo `/api/v1`).

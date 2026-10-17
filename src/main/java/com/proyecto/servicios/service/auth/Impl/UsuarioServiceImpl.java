@@ -94,7 +94,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     private void validarPassword(String rawPassword) {
         if (rawPassword == null || !PASSWORD.matcher(rawPassword).matches()) {
             throw new ContrasenaInvalidaException(
-                    "El password debe tener minimo 8 caracteres, una mayuscula, una minuscula, un numero y un caracter especial");
+                    com.proyecto.servicios.validation.MensajesValidacion.PASSWORD);
         }
     }
 

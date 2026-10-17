@@ -81,12 +81,6 @@ public class CuentaServiceImpl implements CuentaService {
 
     @Override
     @Transactional(readOnly = true)
-    public CuentaResponse obtenerPorNumero(String numeroCuenta) {
-        return cuentaMapper.toResponse(obtenerEntidadPorNumero(numeroCuenta));
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public Cuenta obtenerEntidadPorNumero(String numeroCuenta) {
         return cuentaRepository.findByNumeroCuenta(numeroCuenta)
                 .orElseThrow(() -> new CuentaNoEncontradaException(
@@ -101,14 +95,21 @@ public class CuentaServiceImpl implements CuentaService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<CuentaResponse> consultarPorEstatus(EstatusCuenta estatus) {
-        return cuentaMapper.toResponseList(cuentaRepository.findByEstatus(estatus));
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<CuentaResponse> consultarActivas() {
-        return consultarPorEstatus(EstatusCuenta.ACTIVA);
+    public List<CuentaResponse> buscar(Long clienteId, EstatusCuenta estatus, String numeroCuenta) {
+        if (numeroCuenta != null && !numeroCuenta.isBlank()) {
+            return cuentaMapper.toResponseList(
+                    cuentaRepository.findByNumeroCuenta(numeroCuenta.trim()).stream().toList());
+        }
+        if (clienteId != null && estatus != null) {
+            return cuentaMapper.toResponseList(cuentaRepository.findByClienteIdAndEstatus(clienteId, estatus));
+        }
+        if (clienteId != null) {
+            return cuentaMapper.toResponseList(cuentaRepository.findByClienteId(clienteId));
+        }
+        if (estatus != null) {
+            return cuentaMapper.toResponseList(cuentaRepository.findByEstatus(estatus));
+        }
+        return cuentaMapper.toResponseList(cuentaRepository.findByEstatus(EstatusCuenta.ACTIVA));
     }
 
     @Override

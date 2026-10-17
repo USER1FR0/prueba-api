@@ -4,6 +4,7 @@ import com.proyecto.servicios.catalogo.EstadoCivil;
 import com.proyecto.servicios.catalogo.Sexo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.proyecto.servicios.validation.MayorEdad;
+import com.proyecto.servicios.validation.MensajesValidacion;
 import com.proyecto.servicios.validation.PatronesValidacion;
 import com.proyecto.servicios.validation.UpperCaseDeserializer;
 import jakarta.validation.Valid;
@@ -88,6 +89,6 @@ public class ClienteRequest {
 
     @NotBlank(message = "El password es obligatorio")
     @Pattern(regexp = PatronesValidacion.PASSWORD,
-            message = "El password debe tener minimo 8 caracteres, una mayuscula, una minuscula, un numero y un caracter especial")
+            message = MensajesValidacion.PASSWORD)
     private String password;
 }

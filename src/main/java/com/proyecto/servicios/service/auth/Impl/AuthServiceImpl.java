@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthServiceImpl implements AuthService {
 
     private static final String CREDENCIALES_INVALIDAS = "Correo o password incorrectos";
+    private static final String TIPO_TOKEN = "Bearer";
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
@@ -50,7 +51,7 @@ public class AuthServiceImpl implements AuthService {
 
         return new LoginResponse(
                 usuario.getCorreo(),
-                "Bearer",
+                TIPO_TOKEN,
                 t.token(),
                 t.emitidoEn(),
                 t.expiraEn(),

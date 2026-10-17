@@ -17,19 +17,16 @@ public interface CuentaService {
 
     CuentaResponse crearCuenta(CuentaRequest request);
 
-    CuentaResponse obtenerPorNumero(String numeroCuenta);
-
-    Cuenta obtenerEntidadPorNumero(String numeroCuenta);
+    /** Busqueda combinable: numeroCuenta, clienteId y/o estatus (sin filtros, devuelve activas). */
+    List<CuentaResponse> buscar(Long clienteId, EstatusCuenta estatus, String numeroCuenta);
 
     List<CuentaResponse> consultarPorCliente(Long clienteId);
-
-    List<CuentaResponse> consultarPorEstatus(EstatusCuenta estatus);
-
-    List<CuentaResponse> consultarActivas();
 
     SaldoResponse consultarSaldo(String numeroCuenta);
 
     CuentaResponse actualizarParcial(String numeroCuenta, CuentaUpdateRequest request);
 
     void inactivarCuentasDeCliente(Long clienteId);
+
+    Cuenta obtenerEntidadPorNumero(String numeroCuenta);
 }

@@ -4,6 +4,7 @@ import com.proyecto.servicios.catalogo.EstadoCivil;
 import com.proyecto.servicios.catalogo.Sexo;
 import com.proyecto.servicios.validation.MayorEdad;
 import com.proyecto.servicios.validation.PatronesValidacion;
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -20,6 +21,11 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class ClienteUpdateRequest {
+
+    @Schema(example = "1")
+    @jakarta.validation.constraints.NotNull(message = "El id es obligatorio")
+    @jakarta.validation.constraints.Positive(message = "El id debe ser positivo")
+    private Long id;
 
     @Pattern(regexp = PatronesValidacion.NOMBRE, message = "El nombre solo admite letras y espacios (2 a 50 caracteres)")
     private String nombre;

@@ -1,6 +1,6 @@
 package com.proyecto.servicios.exception;
 
-import jakarta.servlet.http.HttpServletRequest;
+import com.proyecto.servicios.model.common.ApiResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -11,116 +11,83 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.List;
 
 /**
- * Manejador global de excepciones.
- * Las validaciones (incluso anidadas en el domicilio) se aplanan a una
- * lista de mensajes (solo strings), sin exponer la estructura del objeto.
+ * Manejo centralizado de excepciones. Todas las respuestas usan el envelope
+ * ApiResponse (codigo, mensaje, datos). Las excepciones de negocio se agrupan
+ * por familia (404/409/400) para no repetir handlers por cada clase concreta.
  */
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // ---- Validaciones de @Valid en el body (incluye campos anidados) ----
+    // ---- Validacion de @Valid en el body (incluye campos anidados) -> 400 ----
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleBodyValidation(
-            MethodArgumentNotValidException ex, HttpServletRequest req) {
+    public ResponseEntity<ApiResponse<List<String>>> handleBodyValidation(MethodArgumentNotValidException ex) {
         List<String> mensajes = ex.getBindingResult().getFieldErrors().stream()
                 .map(FieldError::getDefaultMessage)
                 .distinct()
                 .toList();
-        return build(HttpStatus.BAD_REQUEST, "Error de validacion", mensajes, req);
+        return build(HttpStatus.BAD_REQUEST, "Error de validacion", mensajes);
     }
 
-    // ---- Validaciones de @RequestParam / @PathVariable ----
+    // ---- Validacion de parametros sueltos -> 400 ----
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<ErrorResponse> handleParamValidation(
-            ConstraintViolationException ex, HttpServletRequest req) {
+    public ResponseEntity<ApiResponse<List<String>>> handleParamValidation(ConstraintViolationException ex) {
         List<String> mensajes = ex.getConstraintViolations().stream()
                 .map(ConstraintViolation::getMessage)
                 .distinct()
                 .toList();
-        return build(HttpStatus.BAD_REQUEST, "Error de validacion", mensajes, req);
+        return build(HttpStatus.BAD_REQUEST, "Error de validacion", mensajes);
     }
 
-    // ---- JSON malformado o enum invalido (ej. sexo, estado civil, estatus) ----
+    // ---- JSON malformado o enum invalido -> 400 ----
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorResponse> handleNotReadable(
-            HttpMessageNotReadableException ex, HttpServletRequest req) {
+    public ResponseEntity<ApiResponse<List<String>>> handleNotReadable(HttpMessageNotReadableException ex) {
         return build(HttpStatus.BAD_REQUEST, "Error de validacion",
-                List.of("El cuerpo de la peticion es invalido o tiene un valor no permitido"), req);
+                List.of("El cuerpo de la peticion es invalido o tiene un valor no permitido"));
     }
 
-    // ---- Tipo de parametro incorrecto (ej. id no numerico) ----
-    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-    public ResponseEntity<ErrorResponse> handleTypeMismatch(
-            MethodArgumentTypeMismatchException ex, HttpServletRequest req) {
-        return build(HttpStatus.BAD_REQUEST, "Error de validacion",
-                List.of("El parametro '" + ex.getName() + "' tiene un valor invalido"), req);
+    // ---- Reglas de negocio (CP inexistente, password invalido) -> 400 ----
+    @ExceptionHandler(ReglaNegocioException.class)
+    public ResponseEntity<ApiResponse<List<String>>> handleReglaNegocio(ReglaNegocioException ex) {
+        return build(HttpStatus.BAD_REQUEST, "Error de validacion", List.of(ex.getMessage()));
     }
 
-    // ---- Password que no cumple la politica -> 400 ----
-    @ExceptionHandler(ContrasenaInvalidaException.class)
-    public ResponseEntity<ErrorResponse> handleContrasena(
-            ContrasenaInvalidaException ex, HttpServletRequest req) {
-        return build(HttpStatus.BAD_REQUEST, "Error de validacion", List.of(ex.getMessage()), req);
+    // ---- Recurso no encontrado -> 404 ----
+    @ExceptionHandler(RecursoNoEncontradoException.class)
+    public ResponseEntity<ApiResponse<List<String>>> handleNoEncontrado(RecursoNoEncontradoException ex) {
+        return build(HttpStatus.NOT_FOUND, "Recurso no encontrado", List.of(ex.getMessage()));
     }
 
-    // ---- Codigo postal que no existe segun la API postal -> 400 ----
-    @ExceptionHandler(CodigoPostalInvalidoException.class)
-    public ResponseEntity<ErrorResponse> handleCodigoPostal(
-            CodigoPostalInvalidoException ex, HttpServletRequest req) {
-        return build(HttpStatus.BAD_REQUEST, "Error de validacion", List.of(ex.getMessage()), req);
-    }
-
-    // ---- Recursos no encontrados -> 404 ----
-    @ExceptionHandler({ClienteNoEncontradoException.class, CuentaNoEncontradaException.class, UsuarioNoEncontradoException.class})
-    public ResponseEntity<ErrorResponse> handleNoEncontrado(
-            RuntimeException ex, HttpServletRequest req) {
-        return build(HttpStatus.NOT_FOUND, "Recurso no encontrado", List.of(ex.getMessage()), req);
+    // ---- Conflicto de negocio (duplicados, estado invalido) -> 409 ----
+    @ExceptionHandler(ConflictoException.class)
+    public ResponseEntity<ApiResponse<List<String>>> handleConflicto(ConflictoException ex) {
+        return build(HttpStatus.CONFLICT, "Conflicto", List.of(ex.getMessage()));
     }
 
     // ---- Credenciales de login invalidas -> 401 ----
     @ExceptionHandler(CredencialesInvalidasException.class)
-    public ResponseEntity<ErrorResponse> handleCredenciales(
-            CredencialesInvalidasException ex, HttpServletRequest req) {
-        return build(HttpStatus.UNAUTHORIZED, "No autorizado", List.of(ex.getMessage()), req);
+    public ResponseEntity<ApiResponse<List<String>>> handleCredenciales(CredencialesInvalidasException ex) {
+        return build(HttpStatus.UNAUTHORIZED, "No autorizado", List.of(ex.getMessage()));
     }
 
-    // ---- Conflictos de negocio -> 409 ----
-    @ExceptionHandler({
-            CurpDuplicadaException.class,
-            RfcDuplicadoException.class,
-            CorreoDuplicadoException.class,
-            ClienteYaRegistradoException.class,
-            OperacionNoPermitidaException.class
-    })
-    public ResponseEntity<ErrorResponse> handleConflicto(
-            RuntimeException ex, HttpServletRequest req) {
-        return build(HttpStatus.CONFLICT, "Conflicto", List.of(ex.getMessage()), req);
-    }
-
-    // ---- Violaciones de integridad en BD (unique, check) -> 409 ----
+    // ---- Violaciones de integridad en BD -> 409 ----
     @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<ErrorResponse> handleDataIntegrity(
-            DataIntegrityViolationException ex, HttpServletRequest req) {
+    public ResponseEntity<ApiResponse<List<String>>> handleDataIntegrity(DataIntegrityViolationException ex) {
         return build(HttpStatus.CONFLICT, "Conflicto de integridad",
-                List.of("La operacion viola una restriccion de la base de datos"), req);
+                List.of("La operacion viola una restriccion de la base de datos"));
     }
 
     // ---- Cualquier otro error no controlado -> 500 ----
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponse> handleGeneric(
-            Exception ex, HttpServletRequest req) {
+    public ResponseEntity<ApiResponse<List<String>>> handleGeneric(Exception ex) {
         return build(HttpStatus.INTERNAL_SERVER_ERROR, "Error interno",
-                List.of("Ocurrio un error inesperado"), req);
+                List.of("Ocurrio un error inesperado"));
     }
 
-    private ResponseEntity<ErrorResponse> build(
-            HttpStatus status, String error, List<String> mensajes, HttpServletRequest req) {
-        ErrorResponse body = new ErrorResponse(status.value(), error, mensajes, req.getRequestURI());
-        return ResponseEntity.status(status).body(body);
+    private ResponseEntity<ApiResponse<List<String>>> build(HttpStatus status, String mensaje, List<String> detalles) {
+        return ResponseEntity.status(status).body(ApiResponse.error(status.value(), mensaje, detalles));
     }
 }
