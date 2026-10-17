@@ -1,5 +1,7 @@
 package com.proyecto.servicios.security;
 
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,9 +13,8 @@ import java.time.Instant;
 import java.util.Date;
 
 /**
- * Genera tokens JWT firmados con HS256. El secreto proviene de una variable
- * de entorno (security.jwt.secret). Componente aislado: hoy solo lo usa el
- * endpoint de login; no filtra ni protege otros endpoints todavia.
+ * Genera y valida tokens JWT firmados con HS256. El secreto proviene de una
+ * variable de entorno (security.jwt.secret).
  */
 @Component
 public class JwtProvider {
@@ -48,5 +49,23 @@ public class JwtProvider {
                 .signWith(key)
                 .compact();
         return new TokenGenerado(token, ahora, exp, expirationMs);
+    }
+
+    /**
+     * Valida la firma y la expiracion y devuelve el subject (correo).
+     * Lanza TokenInvalidoException si el token no es valido o esta vencido.
+     */
+    public String validarYObtenerCorreo(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                    .verifyWith(key)
+                    .requireIssuer(issuer)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
+            return claims.getSubject();
+        } catch (JwtException | IllegalArgumentException e) {
+            throw new TokenInvalidoException("Token invalido o expirado");
+        }
     }
 }

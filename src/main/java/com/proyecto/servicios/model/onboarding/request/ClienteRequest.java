@@ -86,8 +86,8 @@ public class ClienteRequest {
     @Valid
     private DomicilioRequest domicilio;
 
+    // El formato del password lo valida PasswordValidator en el service (fuente unica);
+    // aqui solo se exige su presencia.
     @NotBlank(message = "El password es obligatorio")
-    @Pattern(regexp = PatronesValidacion.PASSWORD,
-            message = "El password debe tener minimo 8 caracteres, una mayuscula, una minuscula, un numero y un caracter especial")
     private String password;
 }

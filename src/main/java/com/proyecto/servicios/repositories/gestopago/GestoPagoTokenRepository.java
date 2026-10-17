@@ -1,4 +1,4 @@
-package com.proyecto.servicios.repositorys.gestopago;
+package com.proyecto.servicios.repositories.gestopago;
 
 import com.proyecto.servicios.entity.gestopago.GestoPagoToken;
 import org.springframework.data.jpa.repository.JpaRepository;

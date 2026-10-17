@@ -1,26 +1,22 @@
-package com.proyecto.servicios.service.auth.Impl;
+package com.proyecto.servicios.service.auth.impl;
 
 import com.proyecto.servicios.entity.auth.Usuario;
-import com.proyecto.servicios.exception.ContrasenaInvalidaException;
 import com.proyecto.servicios.exception.CorreoDuplicadoException;
 import com.proyecto.servicios.exception.UsuarioNoEncontradoException;
 import com.proyecto.servicios.model.auth.response.UsuarioResponse;
-import com.proyecto.servicios.repositorys.auth.UsuarioRepository;
+import com.proyecto.servicios.repositories.auth.UsuarioRepository;
 import com.proyecto.servicios.service.auth.UsuarioService;
-import com.proyecto.servicios.validation.PatronesValidacion;
+import com.proyecto.servicios.validation.PasswordValidator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.regex.Pattern;
 
 @Service
 @Slf4j
 public class UsuarioServiceImpl implements UsuarioService {
-
-    private static final Pattern PASSWORD = Pattern.compile(PatronesValidacion.PASSWORD);
 
     private final UsuarioRepository usuarioRepository;
     private final PasswordEncoder passwordEncoder;
@@ -33,7 +29,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Override
     @Transactional
     public Usuario crearParaCliente(Long clienteId, String correo, String rawPassword) {
-        validarPassword(rawPassword);
+        PasswordValidator.validar(rawPassword);
         if (usuarioRepository.existsByCorreo(correo)) {
             throw new CorreoDuplicadoException("Ya existe un usuario con el correo " + correo);
         }
@@ -61,13 +57,14 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Transactional
     public void sincronizarCorreo(Long clienteId, String nuevoCorreo) {
         usuarioRepository.findByClienteId(clienteId).ifPresent(u -> {
-            if (!u.getCorreo().equalsIgnoreCase(nuevoCorreo)) {
-                if (usuarioRepository.existsByCorreo(nuevoCorreo)) {
-                    throw new CorreoDuplicadoException("Ya existe un usuario con el correo " + nuevoCorreo);
-                }
-                u.setCorreo(nuevoCorreo);
-                usuarioRepository.save(u);
+            if (u.getCorreo().equalsIgnoreCase(nuevoCorreo)) {
+                return;
             }
+            if (usuarioRepository.existsByCorreo(nuevoCorreo)) {
+                throw new CorreoDuplicadoException("Ya existe un usuario con el correo " + nuevoCorreo);
+            }
+            u.setCorreo(nuevoCorreo);
+            usuarioRepository.save(u);
         });
     }
 
@@ -87,15 +84,6 @@ public class UsuarioServiceImpl implements UsuarioService {
                 .orElseThrow(() -> new UsuarioNoEncontradoException("No existe el usuario con id " + id));
         usuario.setActivo(activo);
         return toResponse(usuarioRepository.save(usuario));
-    }
-
-    // ---------- Helpers ----------
-
-    private void validarPassword(String rawPassword) {
-        if (rawPassword == null || !PASSWORD.matcher(rawPassword).matches()) {
-            throw new ContrasenaInvalidaException(
-                    "El password debe tener minimo 8 caracteres, una mayuscula, una minuscula, un numero y un caracter especial");
-        }
     }
 
     private UsuarioResponse toResponse(Usuario u) {

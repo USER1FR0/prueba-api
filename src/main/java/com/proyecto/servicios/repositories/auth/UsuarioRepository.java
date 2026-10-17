@@ -1,4 +1,4 @@
-package com.proyecto.servicios.repositorys.auth;
+package com.proyecto.servicios.repositories.auth;
 
 import com.proyecto.servicios.entity.auth.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,5 +10,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     Optional<Usuario> findByCorreo(String correo);
     Optional<Usuario> findByClienteId(Long clienteId);
     boolean existsByCorreo(String correo);
+    boolean existsByCorreoAndActivoTrue(String correo);
     List<Usuario> findByActivo(Boolean activo);
 }

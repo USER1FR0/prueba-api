@@ -27,10 +27,10 @@ import java.util.Map;
 @EnableTransactionManagement
 @EnableJpaRepositories(
         basePackages = {
-                "com.proyecto.servicios.repositorys.sf",
-                "com.proyecto.servicios.repositorys.gestopago",
-                "com.proyecto.servicios.repositorys.onboarding",
-                "com.proyecto.servicios.repositorys.auth"
+                "com.proyecto.servicios.repositories.sf",
+                "com.proyecto.servicios.repositories.gestopago",
+                "com.proyecto.servicios.repositories.onboarding",
+                "com.proyecto.servicios.repositories.auth"
         },
         transactionManagerRef = "sfTransactionManager",
         entityManagerFactoryRef = "sfEntityManagerFactory"
