@@ -1,9 +1,9 @@
-package com.proyecto.servicios.service.Impl;
+package com.proyecto.servicios.service.impl;
 
 import com.proyecto.servicios.entity.onboarding.Cliente;
 import com.proyecto.servicios.exception.ClienteNoEncontradoException;
-import com.proyecto.servicios.exception.CorreoDuplicadoException;
 import com.proyecto.servicios.exception.CodigoPostalInvalidoException;
+import com.proyecto.servicios.exception.CorreoDuplicadoException;
 import com.proyecto.servicios.exception.CurpDuplicadaException;
 import com.proyecto.servicios.exception.RfcDuplicadoException;
 import com.proyecto.servicios.mapper.ClienteMapper;
@@ -11,14 +11,17 @@ import com.proyecto.servicios.model.onboarding.request.ClienteFiltroRequest;
 import com.proyecto.servicios.model.onboarding.request.ClienteRequest;
 import com.proyecto.servicios.model.onboarding.request.ClienteUpdateRequest;
 import com.proyecto.servicios.model.onboarding.response.ClienteResponse;
-import com.proyecto.servicios.repositorys.onboarding.ClienteRepository;
-import com.proyecto.servicios.repositorys.onboarding.ClienteSpecifications;
+import com.proyecto.servicios.repositories.onboarding.ClienteRepository;
+import com.proyecto.servicios.repositories.onboarding.ClienteSpecifications;
+import com.proyecto.servicios.repositories.onboarding.PaginacionFiltro;
 import com.proyecto.servicios.service.ClienteService;
 import com.proyecto.servicios.service.CuentaService;
 import com.proyecto.servicios.service.auth.UsuarioService;
 import com.proyecto.servicios.service.postal.PostalCodeService;
 import com.proyecto.servicios.service.postal.ResultadoValidacionCP;
+import com.proyecto.servicios.validation.PasswordValidator;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,6 +52,8 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     @Transactional
     public ClienteResponse registrar(ClienteRequest request) {
+        // Fail-fast: valida password y unicidad ANTES de persistir nada.
+        PasswordValidator.validar(request.getPassword());
         validarUnicidad(request.getCurp(), request.getRfc(), request.getCorreo());
         validarCodigoPostal(request.getDomicilio().getCodigoPostal(), request.getDomicilio().getPais());
 
@@ -59,7 +64,7 @@ public class ClienteServiceImpl implements ClienteService {
         Cliente guardado = clienteRepository.save(cliente);
         log.info("Cliente registrado con id {}", guardado.getId());
 
-        cuentaService.crearCuentaParaCliente(guardado, null);
+        cuentaService.crearCuentaInicialParaCliente(guardado.getId(), null);
         usuarioService.crearParaCliente(guardado.getId(), guardado.getCorreo(), request.getPassword());
 
         return construirResponse(guardado);
@@ -68,7 +73,8 @@ public class ClienteServiceImpl implements ClienteService {
     @Override
     @Transactional(readOnly = true)
     public List<ClienteResponse> buscar(ClienteFiltroRequest filtro) {
-        return clienteRepository.findAll(ClienteSpecifications.desde(filtro)).stream()
+        Pageable pageable = PaginacionFiltro.de(filtro.getPage(), filtro.getSize());
+        return clienteRepository.findAll(ClienteSpecifications.desde(filtro), pageable).stream()
                 .map(this::construirResponse)
                 .toList();
     }

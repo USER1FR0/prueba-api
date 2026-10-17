@@ -1,4 +1,4 @@
-package com.proyecto.servicios.repositorys.mongo;
+package com.proyecto.servicios.repositories.mongo;
 
 import com.proyecto.servicios.entity.mongo.ProductoDocument;
 import org.springframework.data.mongodb.repository.MongoRepository;

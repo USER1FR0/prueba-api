@@ -1,9 +1,9 @@
-package com.proyecto.servicios.service.Impl;
+package com.proyecto.servicios.service.impl;
 
 import com.proyecto.servicios.entity.mongo.ProductoDocument;
 import com.proyecto.servicios.mapper.ProductoMapper;
 import com.proyecto.servicios.model.gestopago.productos.Producto;
-import com.proyecto.servicios.repositorys.mongo.ProductoRepository;
+import com.proyecto.servicios.repositories.mongo.ProductoRepository;
 import com.proyecto.servicios.service.CatalogoProductosService;
 import com.proyecto.servicios.service.GestoPagoProductosService;
 import lombok.extern.slf4j.Slf4j;

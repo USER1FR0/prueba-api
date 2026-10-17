@@ -36,11 +36,10 @@ public class CuentaController {
     }
 
     @Operation(summary = "Buscar cuentas (filtros combinables)",
-            description = "Sin filtros devuelve las activas; combina numeroCuenta, clienteId y/o estatus.")
+            description = "Sin filtros devuelve las activas; combina numeroCuenta, clienteId y/o estatus. Incluye paginacion (page, size).")
     @PostMapping("/buscar")
     public ResponseEntity<ApiResponse<List<CuentaResponse>>> buscar(@RequestBody CuentaFiltroRequest filtro) {
-        return ResponseEntity.ok(ApiResponse.ok(
-                cuentaService.buscar(filtro.getClienteId(), filtro.getEstatus(), filtro.getNumeroCuenta())));
+        return ResponseEntity.ok(ApiResponse.ok(cuentaService.buscar(filtro)));
     }
 
     @Operation(summary = "Consultar saldo", description = "Devuelve el saldo de la cuenta indicada en el body.")

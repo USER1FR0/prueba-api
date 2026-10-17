@@ -1,4 +1,4 @@
-package com.proyecto.servicios.repositorys.onboarding;
+package com.proyecto.servicios.repositories.onboarding;
 
 import com.proyecto.servicios.entity.onboarding.Cliente;
 import com.proyecto.servicios.entity.onboarding.Cuenta;

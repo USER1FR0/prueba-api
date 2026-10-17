@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 /**
  * Criterios de busqueda de clientes. Todos opcionales y COMBINABLES:
- * se aplican solo los que vengan presentes.
+ * se aplican solo los que vengan presentes. 'page' y 'size' controlan la paginacion.
  */
 @Getter
 @Setter
@@ -25,4 +25,10 @@ public class ClienteFiltroRequest {
     private Boolean activo;
     private LocalDate desde;
     private LocalDate hasta;
+
+    @Schema(description = "Numero de pagina (0-based). Por defecto 0.", example = "0")
+    private Integer page;
+
+    @Schema(description = "Tamanio de pagina. Por defecto 50, maximo 200.", example = "50")
+    private Integer size;
 }

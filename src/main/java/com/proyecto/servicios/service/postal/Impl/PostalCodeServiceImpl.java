@@ -1,4 +1,4 @@
-package com.proyecto.servicios.service.postal.Impl;
+package com.proyecto.servicios.service.postal.impl;
 
 import com.proyecto.servicios.client.postal.ZipcodestackClient;
 import com.proyecto.servicios.client.postal.ZipcodestackResponse;

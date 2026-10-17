@@ -1,4 +1,4 @@
-package com.proyecto.servicios.service.Impl;
+package com.proyecto.servicios.service.impl;
 
 import com.proyecto.servicios.client.GestoPagoProductosClient;
 import com.proyecto.servicios.exception.GestoPagoProductosCommunicationException;

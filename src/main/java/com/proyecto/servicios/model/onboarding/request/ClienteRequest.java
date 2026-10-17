@@ -4,7 +4,6 @@ import com.proyecto.servicios.catalogo.EstadoCivil;
 import com.proyecto.servicios.catalogo.Sexo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.proyecto.servicios.validation.MayorEdad;
-import com.proyecto.servicios.validation.MensajesValidacion;
 import com.proyecto.servicios.validation.PatronesValidacion;
 import com.proyecto.servicios.validation.UpperCaseDeserializer;
 import jakarta.validation.Valid;
@@ -87,8 +86,8 @@ public class ClienteRequest {
     @Valid
     private DomicilioRequest domicilio;
 
+    // El formato del password lo valida PasswordValidator en el service (fuente unica);
+    // aqui solo se exige su presencia.
     @NotBlank(message = "El password es obligatorio")
-    @Pattern(regexp = PatronesValidacion.PASSWORD,
-            message = MensajesValidacion.PASSWORD)
     private String password;
 }

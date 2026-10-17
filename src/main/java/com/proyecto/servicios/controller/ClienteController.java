@@ -35,7 +35,7 @@ public class ClienteController {
     }
 
     @Operation(summary = "Buscar clientes (filtros combinables)",
-            description = "Endpoint unico de consulta. Sin filtros devuelve todos; con filtros los combina (id, nombre, apellidos, curp, rfc, correo, numeroCuenta, activo, rango de fechas).")
+            description = "Endpoint unico de consulta. Sin filtros devuelve todos; con filtros los combina (id, nombre, apellidos, curp, rfc, correo, numeroCuenta, activo, rango de fechas, pagina y tamanio).")
     @PostMapping("/buscar")
     public ResponseEntity<ApiResponse<List<ClienteResponse>>> buscar(@RequestBody ClienteFiltroRequest filtro) {
         return ResponseEntity.ok(ApiResponse.ok(clienteService.buscar(filtro)));
@@ -50,7 +50,7 @@ public class ClienteController {
 
     @Operation(summary = "Baja logica del cliente",
             description = "Marca al cliente como inactivo e inactiva sus cuentas y su usuario. El id va en el body.")
-    @DeleteMapping
+    @PatchMapping("/baja")
     public ResponseEntity<ApiResponse<Void>> bajaLogica(@Valid @RequestBody IdRequest request) {
         clienteService.bajaLogica(request.getId());
         return ResponseEntity.ok(new ApiResponse<>(0, "Cliente dado de baja", null));

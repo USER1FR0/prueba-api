@@ -1,6 +1,7 @@
 package com.proyecto.servicios.exception;
 
 import com.proyecto.servicios.model.common.ApiResponse;
+import com.proyecto.servicios.security.TokenInvalidoException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -78,6 +79,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiResponse<List<String>>> handleDataIntegrity(DataIntegrityViolationException ex) {
         return build(HttpStatus.CONFLICT, "Conflicto de integridad",
                 List.of("La operacion viola una restriccion de la base de datos"));
+    }
+
+    // ---- Token JWT ausente/invalido/expirado -> 401 ----
+    @ExceptionHandler(TokenInvalidoException.class)
+    public ResponseEntity<ApiResponse<List<String>>> handleTokenInvalido(TokenInvalidoException ex) {
+        return build(HttpStatus.UNAUTHORIZED, "No autorizado", List.of(ex.getMessage()));
     }
 
     // ---- Cualquier otro error no controlado -> 500 ----

@@ -1,11 +1,11 @@
-package com.proyecto.servicios.service.Impl;
+package com.proyecto.servicios.service.impl;
 
 import com.proyecto.servicios.entity.sf.Personas;
 import com.proyecto.servicios.model.EliminaPersonaRequest;
 import com.proyecto.servicios.model.GenericResponse;
 import com.proyecto.servicios.model.PersonaResponse;
 import com.proyecto.servicios.model.PersonasRequest;
-import com.proyecto.servicios.repositorys.sf.PersonasRepository;
+import com.proyecto.servicios.repositories.sf.PersonasRepository;
 import com.proyecto.servicios.service.PersonaService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;

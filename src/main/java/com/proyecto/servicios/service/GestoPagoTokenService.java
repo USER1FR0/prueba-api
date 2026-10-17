@@ -6,7 +6,8 @@ import java.util.Optional;
 
 public interface GestoPagoTokenService {
 
-    void renovarToken();
+    /** Autentica contra GestoPago con las credenciales dadas y persiste el token resultante. */
+    void renovarToken(Integer idDistribuidor, String codigoDispositivo, String password);
 
     Optional<GestoPagoToken> obtenerTokenActivo(Integer idDistribuidor, String codigoDispositivo);
 }
