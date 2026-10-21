@@ -1,8 +1,8 @@
 package com.proyecto.servicios.service.auth.impl;
 
 import com.proyecto.servicios.entity.auth.Usuario;
-import com.proyecto.servicios.exception.CorreoDuplicadoException;
-import com.proyecto.servicios.exception.UsuarioNoEncontradoException;
+import com.proyecto.servicios.exception.ConflictoException;
+import com.proyecto.servicios.exception.RecursoNoEncontradoException;
 import com.proyecto.servicios.model.auth.response.UsuarioResponse;
 import com.proyecto.servicios.repositories.auth.UsuarioRepository;
 import com.proyecto.servicios.service.auth.UsuarioService;
@@ -31,7 +31,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     public Usuario crearParaCliente(Long clienteId, String correo, String rawPassword) {
         PasswordValidator.validar(rawPassword);
         if (usuarioRepository.existsByCorreo(correo)) {
-            throw new CorreoDuplicadoException("Ya existe un usuario con el correo " + correo);
+            throw new ConflictoException("El correo " + correo + " ya esta en uso por otro usuario.");
         }
         Usuario usuario = new Usuario();
         usuario.setClienteId(clienteId);
@@ -61,7 +61,7 @@ public class UsuarioServiceImpl implements UsuarioService {
                 return;
             }
             if (usuarioRepository.existsByCorreo(nuevoCorreo)) {
-                throw new CorreoDuplicadoException("Ya existe un usuario con el correo " + nuevoCorreo);
+                throw new ConflictoException("El correo " + nuevoCorreo + " ya esta en uso por otro usuario.");
             }
             u.setCorreo(nuevoCorreo);
             usuarioRepository.save(u);
@@ -81,7 +81,7 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Transactional
     public UsuarioResponse cambiarEstatus(Long id, Boolean activo) {
         Usuario usuario = usuarioRepository.findById(id)
-                .orElseThrow(() -> new UsuarioNoEncontradoException("No existe el usuario con id " + id));
+                .orElseThrow(() -> new RecursoNoEncontradoException("No se localizo ningun usuario con el id " + id + "."));
         usuario.setActivo(activo);
         return toResponse(usuarioRepository.save(usuario));
     }

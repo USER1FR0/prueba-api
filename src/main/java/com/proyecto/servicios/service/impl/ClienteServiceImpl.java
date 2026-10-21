@@ -1,11 +1,9 @@
 package com.proyecto.servicios.service.impl;
 
 import com.proyecto.servicios.entity.onboarding.Cliente;
-import com.proyecto.servicios.exception.ClienteNoEncontradoException;
-import com.proyecto.servicios.exception.CodigoPostalInvalidoException;
-import com.proyecto.servicios.exception.CorreoDuplicadoException;
-import com.proyecto.servicios.exception.CurpDuplicadaException;
-import com.proyecto.servicios.exception.RfcDuplicadoException;
+import com.proyecto.servicios.exception.ConflictoException;
+import com.proyecto.servicios.exception.RecursoNoEncontradoException;
+import com.proyecto.servicios.exception.ReglaNegocioException;
 import com.proyecto.servicios.mapper.ClienteMapper;
 import com.proyecto.servicios.model.onboarding.request.ClienteFiltroRequest;
 import com.proyecto.servicios.model.onboarding.request.ClienteRequest;
@@ -87,7 +85,7 @@ public class ClienteServiceImpl implements ClienteService {
         if (request.getCorreo() != null
                 && !request.getCorreo().equalsIgnoreCase(cliente.getCorreo())
                 && clienteRepository.existsByCorreo(request.getCorreo())) {
-            throw new CorreoDuplicadoException("Ya existe un cliente con el correo " + request.getCorreo());
+            throw new ConflictoException("El correo " + request.getCorreo() + " ya esta asociado a otro cliente.");
         }
 
         clienteMapper.actualizarCliente(request, cliente);
@@ -121,26 +119,26 @@ public class ClienteServiceImpl implements ClienteService {
 
     private void validarUnicidad(String curp, String rfc, String correo) {
         if (clienteRepository.existsByCurp(curp)) {
-            throw new CurpDuplicadaException("Ya existe un cliente con la CURP " + curp);
+            throw new ConflictoException("La CURP " + curp + " ya se encuentra registrada en el sistema.");
         }
         if (clienteRepository.existsByRfc(rfc)) {
-            throw new RfcDuplicadoException("Ya existe un cliente con el RFC " + rfc);
+            throw new ConflictoException("El RFC " + rfc + " ya se encuentra registrado en el sistema.");
         }
         if (clienteRepository.existsByCorreo(correo)) {
-            throw new CorreoDuplicadoException("Ya existe un cliente con el correo " + correo);
+            throw new ConflictoException("El correo " + correo + " ya se encuentra registrado en el sistema.");
         }
     }
 
     private void validarCodigoPostal(String codigoPostal, String pais) {
         if (postalCodeService.validar(codigoPostal, pais) == ResultadoValidacionCP.NO_EXISTE) {
-            throw new CodigoPostalInvalidoException(
-                    "El codigo postal " + codigoPostal + " no existe para el pais " + pais);
+            throw new ReglaNegocioException(
+                    "El codigo postal " + codigoPostal + " no corresponde a una ubicacion real en " + pais + ".");
         }
     }
 
     private Cliente buscarPorId(Long id) {
         return clienteRepository.findById(id)
-                .orElseThrow(() -> new ClienteNoEncontradoException("No existe el cliente con id " + id));
+                .orElseThrow(() -> new RecursoNoEncontradoException("No se localizo ningun cliente con el id " + id + "."));
     }
 
     private ClienteResponse construirResponse(Cliente cliente) {

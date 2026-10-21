@@ -1,8 +1,8 @@
 package com.proyecto.servicios.exception;
 
-/** Familia 404: el recurso solicitado no existe. */
-public abstract class RecursoNoEncontradoException extends NegocioException {
-    protected RecursoNoEncontradoException(String message) {
+/** 404: el recurso solicitado no existe (cliente, cuenta o usuario). */
+public class RecursoNoEncontradoException extends NegocioException {
+    public RecursoNoEncontradoException(String message) {
         super(message);
     }
 }

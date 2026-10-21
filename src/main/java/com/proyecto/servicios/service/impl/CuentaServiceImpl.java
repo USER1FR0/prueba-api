@@ -3,9 +3,8 @@ package com.proyecto.servicios.service.impl;
 import com.proyecto.servicios.catalogo.EstatusCuenta;
 import com.proyecto.servicios.entity.onboarding.Cliente;
 import com.proyecto.servicios.entity.onboarding.Cuenta;
-import com.proyecto.servicios.exception.ClienteNoEncontradoException;
-import com.proyecto.servicios.exception.CuentaNoEncontradaException;
-import com.proyecto.servicios.exception.OperacionNoPermitidaException;
+import com.proyecto.servicios.exception.ConflictoException;
+import com.proyecto.servicios.exception.RecursoNoEncontradoException;
 import com.proyecto.servicios.mapper.CuentaMapper;
 import com.proyecto.servicios.model.onboarding.request.CuentaFiltroRequest;
 import com.proyecto.servicios.model.onboarding.request.CuentaRequest;
@@ -92,8 +91,8 @@ public class CuentaServiceImpl implements CuentaService {
         Cuenta cuenta = buscarPorNumero(numeroCuenta);
         if (request.getEstatus() == EstatusCuenta.ACTIVA
                 && !Boolean.TRUE.equals(cuenta.getCliente().getActivo())) {
-            throw new OperacionNoPermitidaException(
-                    "No se puede activar una cuenta de un cliente inactivo");
+            throw new ConflictoException(
+                    "No es posible reactivar la cuenta: el cliente se encuentra inactivo.");
         }
         cuenta.setEstatus(request.getEstatus());
         return cuentaMapper.toResponse(cuentaRepository.save(cuenta));
@@ -113,7 +112,7 @@ public class CuentaServiceImpl implements CuentaService {
     private CuentaResponse crear(Cliente cliente, BigDecimal saldoInicial) {
         BigDecimal saldo = (saldoInicial != null) ? saldoInicial : saldoInicialPorDefecto;
         if (saldo.signum() < 0) {
-            throw new OperacionNoPermitidaException("El saldo inicial no puede ser negativo");
+            throw new ConflictoException("El saldo inicial debe ser igual o mayor a cero.");
         }
 
         Cuenta cuenta = new Cuenta();
@@ -129,19 +128,19 @@ public class CuentaServiceImpl implements CuentaService {
 
     private Cliente buscarClienteActivo(Long clienteId) {
         Cliente cliente = clienteRepository.findById(clienteId)
-                .orElseThrow(() -> new ClienteNoEncontradoException(
-                        "No existe el cliente con id " + clienteId));
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                        "No se localizo ningun cliente con el id " + clienteId + "."));
         if (!Boolean.TRUE.equals(cliente.getActivo())) {
-            throw new OperacionNoPermitidaException(
-                    "No se puede crear una cuenta activa para un cliente inactivo");
+            throw new ConflictoException(
+                    "No es posible aperturar una cuenta: el cliente se encuentra inactivo.");
         }
         return cliente;
     }
 
     private Cuenta buscarPorNumero(String numeroCuenta) {
         return cuentaRepository.findByNumeroCuenta(numeroCuenta)
-                .orElseThrow(() -> new CuentaNoEncontradaException(
-                        "No existe la cuenta " + numeroCuenta));
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                        "La cuenta " + numeroCuenta + " no existe."));
     }
 
     private boolean sinFiltrosEspecificos(CuentaFiltroRequest f) {

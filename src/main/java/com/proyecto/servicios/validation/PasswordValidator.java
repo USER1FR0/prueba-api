@@ -1,6 +1,6 @@
 package com.proyecto.servicios.validation;
 
-import com.proyecto.servicios.exception.ContrasenaInvalidaException;
+import com.proyecto.servicios.exception.ReglaNegocioException;
 
 import java.util.regex.Pattern;
 
@@ -17,7 +17,7 @@ public final class PasswordValidator {
 
     public static void validar(String rawPassword) {
         if (rawPassword == null || !PATRON.matcher(rawPassword).matches()) {
-            throw new ContrasenaInvalidaException(MensajesValidacion.PASSWORD);
+            throw new ReglaNegocioException(MensajesValidacion.PASSWORD);
         }
     }
 }
