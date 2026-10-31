@@ -68,6 +68,24 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.CONFLICT, "Conflicto", List.of(ex.getMessage()));
     }
 
+    // ---- Operacion sobre recurso no autorizado -> 403 ----
+    @ExceptionHandler(OperacionNoAutorizadaException.class)
+    public ResponseEntity<ApiResponse<List<String>>> handleNoAutorizada(OperacionNoAutorizadaException ex) {
+        return build(HttpStatus.FORBIDDEN, "Operacion no autorizada", List.of(ex.getMessage()));
+    }
+
+    // ---- Rechazo del proveedor externo -> 422 ----
+    @ExceptionHandler(TransaccionRechazadaException.class)
+    public ResponseEntity<ApiResponse<List<String>>> handleRechazada(TransaccionRechazadaException ex) {
+        return build(HttpStatus.UNPROCESSABLE_ENTITY, "Transaccion rechazada", List.of(ex.getMessage()));
+    }
+
+    // ---- Proveedor externo no disponible -> 503 ----
+    @ExceptionHandler(ProveedorNoDisponibleException.class)
+    public ResponseEntity<ApiResponse<List<String>>> handleProveedor(ProveedorNoDisponibleException ex) {
+        return build(HttpStatus.SERVICE_UNAVAILABLE, "Servicio no disponible", List.of(ex.getMessage()));
+    }
+
     // ---- Credenciales de login invalidas -> 401 ----
     @ExceptionHandler(CredencialesInvalidasException.class)
     public ResponseEntity<ApiResponse<List<String>>> handleCredenciales(CredencialesInvalidasException ex) {

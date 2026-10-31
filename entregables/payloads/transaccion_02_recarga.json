@@ -1,0 +1,8 @@
+{
+  "idempotencyKey": "recarga-juan-001",
+  "numeroCuenta": "<<NUMERO_CUENTA_DEL_ALTA>>",
+  "idServicio": 2284,
+  "idProducto": 14293,
+  "monto": 50.00,
+  "telefono": "5512345678"
+}

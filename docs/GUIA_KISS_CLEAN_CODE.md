@@ -193,6 +193,55 @@ public ClienteService(ClienteRepository repo) { this.repo = repo; }
 
 ---
 
+## 15. Centraliza las excepciones (no una clase por caso)
+
+- No crees una clase de excepción por cada error puntual. **Agrúpalas por familia** y pon el detalle en el mensaje.
+- Pocas excepciones base, mapeadas a su código HTTP, cubren casi todo: *no encontrado* (404), *conflicto* (409), *regla de negocio* (400), *no autorizado* (401).
+- El manejador central decide el código por la familia; el mensaje da el detalle.
+
+```text
+// Mal: ClienteNoEncontrado, CuentaNoEncontrada, UsuarioNoEncontrado... (una por caso)
+// Bien: una sola familia
+throw new RecursoNoEncontradoException("No se localizó el cliente con id " + id);
+```
+
+---
+
+## 16. Identificadores públicos opacos
+
+- No expongas la **llave de negocio** (CURP, RFC, email) como identificador del recurso: es sensible, adivinable y correlacionable.
+- No uses IDs **secuenciales** en la API: son enumerables (1, 2, 3…). Prefiere un identificador surrogate **opaco** (ej. UUID) para lo que viaja hacia afuera, y deja el ID interno para las llaves y relaciones.
+- Separa **identidad** (quién es) de **handle del recurso** (cómo lo referencio).
+
+```text
+// Mal: /recurso/5           (enumerable)   ·   /recurso/{curp}  (dato sensible)
+// Bien: /recurso/{uuid}     (opaco, sin significado fuera del sistema)
+```
+
+---
+
+## 17. Autenticación ≠ autorización
+
+- **Autenticar** (saber quién eres) no es **autorizar** (saber qué puedes tocar). Hacen falta las dos.
+- Mover datos al *body* en vez de la URL mejora la privacidad, **no** es un control de seguridad: el campo es igual de manipulable.
+- Evita el acceso a recursos ajenos (IDOR) validando que el usuario autenticado tenga permiso sobre ese recurso.
+- Al validar un token, no basta la firma y la expiración: confirma que el usuario **siga existiendo y activo**.
+
+---
+
+## 18. Portabilidad entre entornos
+
+- No dependas de diferencias de **mayúsculas/minúsculas** en nombres de archivos o carpetas: Windows no las distingue y Linux sí → lo que "compila en mi máquina" truena en el servidor (clases/archivos duplicados).
+- La **configuración** (URLs, puertos, credenciales) va en variables de entorno, nunca incrustada ni versionada.
+- Lee valores del entorno con un valor por defecto sensato (ej. puerto dinámico) para que corra igual en local y en producción.
+
+```text
+// Bien: puerto que respeta el entorno
+server.port=${PORT:8081}
+```
+
+---
+
 ## Code smells a evitar
 
 - Funciones largas o con muchos parámetros.
@@ -220,3 +269,7 @@ public ClienteService(ClienteRepository repo) { this.repo = repo; }
 - [ ] ¿Respuestas con formato uniforme?
 - [ ] ¿Sin datos sensibles en logs ni en las respuestas?
 - [ ] ¿Hay pruebas para lo importante?
+- [ ] ¿Pocas excepciones por familia en vez de una clase por caso?
+- [ ] ¿Los identificadores públicos son opacos (no llaves sensibles ni IDs secuenciales)?
+- [ ] ¿Hay autorización, no solo autenticación?
+- [ ] ¿El código es portable (sin depender de mayúsculas/minúsculas, config por entorno)?
