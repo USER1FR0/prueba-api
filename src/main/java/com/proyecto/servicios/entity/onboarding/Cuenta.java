@@ -28,6 +28,11 @@ public class Cuenta {
     @Column(name = "saldo", nullable = false, precision = 16, scale = 2)
     private BigDecimal saldo;
 
+    /** Control de concurrencia optimista: evita que dos operaciones pisen el saldo. */
+    @Version
+    @Column(name = "version", nullable = false)
+    private Long version;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "estatus", nullable = false, length = 10)
     private EstatusCuenta estatus;

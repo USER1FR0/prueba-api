@@ -1,0 +1,8 @@
+{
+  "idempotencyKey": "servicio-juan-001",
+  "numeroCuenta": "<<NUMERO_CUENTA_DEL_ALTA>>",
+  "idServicio": 0,
+  "idProducto": 0,
+  "monto": 150.00,
+  "referencia": "1234567890"
+}
